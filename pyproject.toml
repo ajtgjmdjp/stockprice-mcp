@@ -1,5 +1,5 @@
 [project]
-name = "yf-mcp"
+name = "jpstock-mcp"
 version = "0.1.0"
 description = "Yahoo Finance MCP server — free stock prices & FX rates for Claude Desktop"
 readme = "README.md"
