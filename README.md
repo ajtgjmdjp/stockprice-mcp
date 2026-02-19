@@ -76,9 +76,7 @@ asyncio.run(main())
 
 ## Disclaimer
 
-This package uses [yfinance](https://github.com/ranaroussi/yfinance) (Apache 2.0) to access Yahoo Finance data.
-yfinance is not affiliated with or endorsed by Yahoo.
-Users are responsible for complying with [Yahoo Finance's Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/).
+This package uses [yfinance](https://github.com/ranaroussi/yfinance) (Apache 2.0).
 Data is intended for personal, educational, and research use.
 
 ## License
