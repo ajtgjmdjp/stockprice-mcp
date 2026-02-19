@@ -2,10 +2,14 @@
 
 Yahoo Finance MCP server for Claude Desktop — free stock prices, price history, and FX rates. No API key required.
 
+> **Note**: The PyPI package for this project is published as **`yf-mcp`** (not `yfinance-mcp`).
+> An unrelated package named `yfinance-mcp` exists on PyPI — it is not affiliated with this project or with [yfinance](https://github.com/ranaroussi/yfinance).
+> Please install via `pip install yf-mcp` or `uvx yf-mcp serve`.
+
 ## Setup (Claude Desktop)
 
 ```bash
-uvx yfinance-mcp serve
+uvx yf-mcp serve
 ```
 
 Add to `claude_desktop_config.json`:
@@ -15,7 +19,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "yfinance": {
       "command": "uvx",
-      "args": ["yfinance-mcp", "serve"]
+      "args": ["yf-mcp", "serve"]
     }
   }
 }
@@ -47,7 +51,7 @@ yfinance でソニーのティッカーを検索して
 ## CLI
 
 ```bash
-pip install yfinance-mcp
+pip install yf-mcp
 
 yfinance-mcp price 7203          # 最新株価
 yfinance-mcp history 7203 --start 2025-01-01  # 価格履歴
