@@ -1,7 +1,7 @@
 [project]
-name = "jpstock-mcp"
+name = "stockprice-mcp"
 version = "0.1.0"
-description = "Yahoo Finance MCP server — free stock prices & FX rates for Claude Desktop"
+description = "Stock price & FX MCP server for Claude Desktop, powered by yfinance — no API key required"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
@@ -32,9 +32,9 @@ dependencies = [
 yfinance-mcp = "yfinance_mcp.cli:cli"
 
 [project.urls]
-Homepage = "https://github.com/ajtgjmdjp/yfinance-mcp"
-Repository = "https://github.com/ajtgjmdjp/yfinance-mcp"
-Issues = "https://github.com/ajtgjmdjp/yfinance-mcp/issues"
+Homepage = "https://github.com/ajtgjmdjp/stockprice-mcp"
+Repository = "https://github.com/ajtgjmdjp/stockprice-mcp"
+Issues = "https://github.com/ajtgjmdjp/stockprice-mcp/issues"
 
 [build-system]
 requires = ["hatchling"]

@@ -1,15 +1,14 @@
-# yfinance-mcp
+# stockprice-mcp
 
-Yahoo Finance MCP server for Claude Desktop — free stock prices, price history, and FX rates. No API key required.
+Stock price & FX rate MCP server for Claude Desktop, powered by [yfinance](https://github.com/ranaroussi/yfinance). No API key required.
 
-> **Note**: The PyPI package for this project is published as **`jpstock-mcp`** (not `yfinance-mcp`).
-> An unrelated package named `yfinance-mcp` exists on PyPI — it is not affiliated with this project or with [yfinance](https://github.com/ranaroussi/yfinance).
-> Please install via `pip install jpstock-mcp` or `uvx jpstock-mcp serve`.
+> **Note**: An unrelated package named `yfinance-mcp` exists on PyPI — it is not affiliated with this project.
+> This project is published as **`stockprice-mcp`**.
 
 ## Setup (Claude Desktop)
 
 ```bash
-uvx jpstock-mcp serve
+uvx stockprice-mcp serve
 ```
 
 Add to `claude_desktop_config.json`:
@@ -17,9 +16,9 @@ Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "yfinance": {
+    "stockprice": {
       "command": "uvx",
-      "args": ["jpstock-mcp", "serve"]
+      "args": ["stockprice-mcp", "serve"]
     }
   }
 }
@@ -37,28 +36,28 @@ Add to `claude_desktop_config.json`:
 ## Usage in Claude Desktop
 
 ```text
-yfinance でトヨタ（7203）の最新株価を教えて
+stockprice でトヨタ（7203）の最新株価を教えて
 ```
 
 ```text
-yfinance で USDJPY の直近1週間の推移を確認して
+stockprice で USDJPY の直近1週間の推移を確認して
 ```
 
 ```text
-yfinance でソニーのティッカーを検索して
+stockprice でソニーのティッカーを検索して
 ```
 
 ## CLI
 
 ```bash
-pip install jpstock-mcp
+pip install stockprice-mcp
 
-yfinance-mcp price 7203          # 最新株価
-yfinance-mcp history 7203 --start 2025-01-01  # 価格履歴
-yfinance-mcp fx                  # FXレート
-yfinance-mcp search Toyota       # ティッカー検索
-yfinance-mcp test                # 疎通確認
-yfinance-mcp serve               # MCPサーバー起動
+yfinance-mcp price 7203                        # 最新株価
+yfinance-mcp history 7203 --start 2025-01-01   # 価格履歴
+yfinance-mcp fx                                # FXレート
+yfinance-mcp search Toyota                     # ティッカー検索
+yfinance-mcp test                              # 疎通確認
+yfinance-mcp serve                             # MCPサーバー起動
 ```
 
 ## Python
