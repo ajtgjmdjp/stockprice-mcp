@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
@@ -11,9 +11,6 @@ from yfinance_mcp.client import FxRates, PriceHistory, StockPrice, YfinanceClien
 
 
 def _make_hist(rows: list[dict]) -> pd.DataFrame:
-    import pandas as pd
-    from datetime import date
-
     dates = pd.to_datetime([r["date"] for r in rows])
     df = pd.DataFrame(rows, index=dates)
     df.index.name = "Date"
@@ -21,7 +18,14 @@ def _make_hist(rows: list[dict]) -> pd.DataFrame:
 
 
 SAMPLE_ROWS = [
-    {"date": f"2025-01-{i:02d}", "Open": 2000.0 + i, "High": 2100.0 + i, "Low": 1900.0 + i, "Close": 2050.0 + i, "Volume": 1000000}
+    {
+        "date": f"2025-01-{i:02d}",
+        "Open": 2000.0 + i,
+        "High": 2100.0 + i,
+        "Low": 1900.0 + i,
+        "Close": 2050.0 + i,
+        "Volume": 1000000,
+    }
     for i in range(1, 32)
 ]
 
@@ -32,7 +36,11 @@ class TestGetStockPrice:
         hist = _make_hist(SAMPLE_ROWS)
         mock_ticker = MagicMock()
         mock_ticker.history.return_value = hist
-        mock_ticker.info = {"trailingPE": 12.5, "marketCap": 50000000000, "sector": "Consumer Cyclical"}
+        mock_ticker.info = {
+            "trailingPE": 12.5,
+            "marketCap": 50000000000,
+            "sector": "Consumer Cyclical",
+        }
 
         with patch("yfinance.Ticker", return_value=mock_ticker):
             client = YfinanceClient()
@@ -61,7 +69,7 @@ class TestGetStockPrice:
 
     @pytest.mark.asyncio
     async def test_returns_none_on_exception(self):
-        with patch("yfinance.Ticker", side_effect=Exception("network error")):
+        with patch("yfinance.Ticker", side_effect=OSError("network error")):
             client = YfinanceClient()
             result = await client.get_stock_price("7203")
 
@@ -182,7 +190,13 @@ class TestSearchTicker:
     async def test_returns_results(self):
         mock_search = MagicMock()
         mock_search.quotes = [
-            {"symbol": "7203.T", "shortname": "TOYOTA MOTOR", "longname": "Toyota Motor Corporation", "exchange": "TSE", "quoteType": "EQUITY"},
+            {
+                "symbol": "7203.T",
+                "shortname": "TOYOTA MOTOR",
+                "longname": "Toyota Motor Corporation",
+                "exchange": "TSE",
+                "quoteType": "EQUITY",
+            },
         ]
 
         with patch("yfinance.Search", return_value=mock_search):
@@ -194,7 +208,7 @@ class TestSearchTicker:
 
     @pytest.mark.asyncio
     async def test_returns_empty_on_exception(self):
-        with patch("yfinance.Search", side_effect=Exception("search failed")):
+        with patch("yfinance.Search", side_effect=OSError("search failed")):
             client = YfinanceClient()
             results = await client.search_ticker("xxx")
 

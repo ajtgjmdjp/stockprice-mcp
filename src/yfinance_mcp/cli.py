@@ -1,4 +1,8 @@
-"""CLI for yfinance-mcp."""
+"""Command-line interface for yfinance-mcp.
+
+Provides Click commands for querying stock prices, OHLCV history,
+FX rates, and ticker search, plus an MCP server launcher.
+"""
 
 from __future__ import annotations
 
@@ -18,7 +22,14 @@ def cli() -> None:
 @cli.command()
 @click.argument("code")
 def price(code: str) -> None:
-    """Get latest stock price for a TSE-listed stock (e.g. 7203)."""
+    """Get latest stock price for a TSE-listed stock (e.g. 7203).
+
+    Args:
+        code: 4-digit TSE stock code.
+
+    Raises:
+        SystemExit: If no data is found for the given code.
+    """
     client = YfinanceClient()
     result = asyncio.run(client.get_stock_price(code))
     if result is None:
@@ -33,9 +44,23 @@ def price(code: str) -> None:
 @click.option("--end", default=None, help="End date YYYY-MM-DD (default: today)")
 @click.option("--interval", default="1d", help="1d / 1wk / 1mo")
 def history(code: str, start: str, end: str | None, interval: str) -> None:
-    """Get OHLCV price history for a TSE-listed stock."""
+    """Get OHLCV price history for a TSE-listed stock.
+
+    Args:
+        code: 4-digit TSE stock code.
+        start: Start date in ``YYYY-MM-DD`` format.
+        end: End date in ``YYYY-MM-DD`` format, or ``None`` for today.
+        interval: Data interval (``"1d"``, ``"1wk"``, or ``"1mo"``).
+
+    Raises:
+        SystemExit: If no history is found for the given code and range.
+    """
     client = YfinanceClient()
-    result = asyncio.run(client.get_stock_history(code, start_date=start, end_date=end, interval=interval))
+    result = asyncio.run(
+        client.get_stock_history(
+            code, start_date=start, end_date=end, interval=interval
+        )
+    )
     if result is None:
         click.echo(f"No history found for {code}", err=True)
         raise SystemExit(1)
@@ -48,7 +73,15 @@ def history(code: str, start: str, end: str | None, interval: str) -> None:
 @cli.command()
 @click.option("--pairs", default=None, help="Comma-separated pairs e.g. USDJPY,EURJPY")
 def fx(pairs: str | None) -> None:
-    """Get JPY FX rates (USDJPY, EURJPY, GBPJPY, CNYJPY)."""
+    """Get JPY FX rates (USDJPY, EURJPY, GBPJPY, CNYJPY).
+
+    Args:
+        pairs: Comma-separated pair names (e.g. ``"USDJPY,EURJPY"``),
+            or ``None`` to fetch all four.
+
+    Raises:
+        SystemExit: If FX rate fetching fails entirely.
+    """
     client = YfinanceClient()
     pair_list = pairs.split(",") if pairs else None
     result = asyncio.run(client.get_fx_rates(pair_list))
@@ -61,7 +94,11 @@ def fx(pairs: str | None) -> None:
 @cli.command()
 @click.argument("query")
 def search(query: str) -> None:
-    """Search for a ticker by company name."""
+    """Search for a ticker by company name or keyword.
+
+    Args:
+        query: Company name or keyword to search.
+    """
     client = YfinanceClient()
     results = asyncio.run(client.search_ticker(query))
     click.echo(json.dumps(results, ensure_ascii=False, indent=2))
@@ -91,6 +128,6 @@ def test() -> None:
 
 @cli.command()
 def serve() -> None:
-    """Start the MCP server."""
+    """Start the MCP server over stdio."""
     from .server import mcp
     mcp.run()
