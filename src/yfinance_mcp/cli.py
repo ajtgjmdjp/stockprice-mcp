@@ -8,15 +8,46 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
+import sys
+from dataclasses import asdict
 
-import click
+try:
+    import click
+    from loguru import logger
+except ImportError:
+    print(
+        "stockprice-mcp CLI requires the 'server' extras.\n"
+        "Install with: pip install 'stockprice-mcp[server]'",
+        file=sys.stderr,
+    )
+    raise SystemExit(1) from None
 
 from .client import YfinanceClient
+
+
+class _InterceptHandler(logging.Handler):
+    """Route stdlib logging through loguru for unified formatting."""
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno  # type: ignore[assignment]
+        frame = logging.currentframe()
+        depth = 0
+        while frame is not None and (depth == 0 or frame.f_code.co_filename == logging.__file__):
+            frame = frame.f_back  # type: ignore[assignment]
+            depth += 1
+        logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
 
 
 @click.group()
 def cli() -> None:
     """yfinance-mcp: Yahoo Finance MCP server and CLI."""
+    logger.remove()
+    logger.add(sys.stderr, level="INFO", format="{time:HH:mm:ss} | {level:<7} | {message}")
+    logging.basicConfig(handlers=[_InterceptHandler()], level="INFO", force=True)
 
 
 @cli.command()
@@ -35,7 +66,7 @@ def price(code: str) -> None:
     if result is None:
         click.echo(f"No data found for {code}", err=True)
         raise SystemExit(1)
-    click.echo(json.dumps(result.__dict__, ensure_ascii=False, indent=2))
+    click.echo(json.dumps(asdict(result), ensure_ascii=False, indent=2))
 
 
 @cli.command()
@@ -57,17 +88,23 @@ def history(code: str, start: str, end: str | None, interval: str) -> None:
     """
     client = YfinanceClient()
     result = asyncio.run(
-        client.get_stock_history(
-            code, start_date=start, end_date=end, interval=interval
-        )
+        client.get_stock_history(code, start_date=start, end_date=end, interval=interval)
     )
     if result is None:
         click.echo(f"No history found for {code}", err=True)
         raise SystemExit(1)
-    click.echo(json.dumps(
-        {"ticker": result.ticker, "start": result.start, "end": result.end, "data": result.rows},
-        ensure_ascii=False, indent=2
-    ))
+    click.echo(
+        json.dumps(
+            {
+                "ticker": result.ticker,
+                "start": result.start,
+                "end": result.end,
+                "data": result.rows,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
 
 @cli.command()
@@ -88,7 +125,7 @@ def fx(pairs: str | None) -> None:
     if result is None:
         click.echo("Failed to fetch FX rates", err=True)
         raise SystemExit(1)
-    click.echo(json.dumps(result.__dict__, ensure_ascii=False, indent=2))
+    click.echo(json.dumps(asdict(result), ensure_ascii=False, indent=2))
 
 
 @cli.command()
@@ -107,6 +144,7 @@ def search(query: str) -> None:
 @cli.command()
 def test() -> None:
     """Run a quick connectivity test."""
+
     async def _test() -> None:
         client = YfinanceClient()
         click.echo("Testing stock price (Toyota 7203)...")
@@ -130,4 +168,5 @@ def test() -> None:
 def serve() -> None:
     """Start the MCP server over stdio."""
     from .server import mcp
+
     mcp.run()

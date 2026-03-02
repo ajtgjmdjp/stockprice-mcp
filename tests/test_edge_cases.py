@@ -164,6 +164,7 @@ class TestEmptyResults:
     async def test_stock_price_info_raises_yfexception(self):
         """ticker.info can fail independently — price should still be returned."""
         hist = _make_hist(MINIMAL_ROWS)
+
         def _raise_yf(self):
             raise YFException("rate limited")
 
@@ -429,9 +430,7 @@ class TestServerHistoryEdgeCases:
         """Invalid intervals are passed to yfinance which returns None."""
         with patch("yfinance_mcp.server._client") as mock_client:
             mock_client.get_stock_history = AsyncMock(return_value=None)
-            result = await get_stock_history(
-                "7203", start_date="2025-01-01", interval="invalid"
-            )
+            result = await get_stock_history("7203", start_date="2025-01-01", interval="invalid")
 
         assert "error" in result
         mock_client.get_stock_history.assert_awaited_once_with(
@@ -533,9 +532,7 @@ class TestFutureDates:
 
         with patch("yfinance.Ticker", return_value=mock_ticker):
             client = YfinanceClient()
-            result = await client.get_stock_history(
-                "7203", start_date="2099-01-01"
-            )
+            result = await client.get_stock_history("7203", start_date="2099-01-01")
 
         assert result is None
 
@@ -577,9 +574,7 @@ class TestFutureDates:
         """Server-level: future date returns error dict."""
         with patch("yfinance_mcp.server._client") as mock_client:
             mock_client.get_stock_history = AsyncMock(return_value=None)
-            result = await get_stock_history(
-                "7203", start_date="2099-01-01"
-            )
+            result = await get_stock_history("7203", start_date="2099-01-01")
 
         assert "error" in result
 

@@ -1,6 +1,6 @@
 [project]
 name = "stockprice-mcp"
-version = "0.1.1"
+version = "0.2.0"
 description = "Stock price & FX MCP server for Claude Desktop, powered by yfinance — no API key required"
 readme = "README.md"
 license = "Apache-2.0"
@@ -22,6 +22,10 @@ classifiers = [
 ]
 dependencies = [
     "yfinance>=0.2",
+]
+
+[project.optional-dependencies]
+server = [
     "fastmcp>=2.0",
     "click>=8.0",
     "pydantic>=2.0",
@@ -41,7 +45,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.sdist]
-exclude = [".env", ".env.*", ".mcpregistry_*", ".claude/"]
+exclude = [".env", ".env.*", ".mcpregistry_*", ".claude/", ".github/"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/yfinance_mcp"]
@@ -55,6 +59,9 @@ src = ["src"]
 select = ["E", "F", "I", "UP", "B", "SIM", "TCH", "RUF"]
 ignore = ["RUF001"]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["TCH"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
@@ -66,13 +73,14 @@ packages = ["yfinance_mcp"]
 mypy_path = ["src"]
 
 [[tool.mypy.overrides]]
-module = ["yfinance", "yfinance.*"]
+module = ["yfinance", "yfinance.*", "pandas", "pandas.*"]
 ignore_missing_imports = true
-follow_untyped_imports = false
 
 [dependency-groups]
 dev = [
+    "stockprice-mcp[server]",
     "mypy>=1.0",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
+    "ruff>=0.4",
 ]

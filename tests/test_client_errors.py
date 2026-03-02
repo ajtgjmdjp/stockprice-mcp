@@ -101,10 +101,15 @@ class TestMissingColumns:
     @pytest.mark.asyncio
     async def test_stock_price_missing_close_column(self):
         """DataFrame without 'Close' → KeyError caught → None."""
-        rows = [{
-            "date": "2025-01-01", "Open": 1000.0,
-            "High": 1100.0, "Low": 900.0, "Volume": 500000,
-        }]
+        rows = [
+            {
+                "date": "2025-01-01",
+                "Open": 1000.0,
+                "High": 1100.0,
+                "Low": 900.0,
+                "Volume": 500000,
+            }
+        ]
         dates = pd.to_datetime(["2025-01-01"])
         df = pd.DataFrame(rows, index=dates)
 
@@ -121,10 +126,15 @@ class TestMissingColumns:
     @pytest.mark.asyncio
     async def test_history_missing_volume_column(self):
         """History DataFrame without 'Volume' → KeyError caught → None."""
-        rows = [{
-            "date": "2025-01-01", "Open": 1000.0,
-            "High": 1100.0, "Low": 900.0, "Close": 1050.0,
-        }]
+        rows = [
+            {
+                "date": "2025-01-01",
+                "Open": 1000.0,
+                "High": 1100.0,
+                "Low": 900.0,
+                "Close": 1050.0,
+            }
+        ]
         dates = pd.to_datetime(["2025-01-01"])
         df = pd.DataFrame(rows, index=dates)
 

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from loguru import logger
 from yfinance.exceptions import YFException
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from datetime import date
@@ -162,8 +164,8 @@ def _build_stock_price(
         volume=int(latest["Volume"]),
         week52_high=float(hist["High"].max()),
         week52_low=float(hist["Low"].min()),
-        avg_volume_30d=int(avg_vol_30d) if avg_vol_30d else None,
-        avg_volume_90d=int(avg_vol_90d) if avg_vol_90d else None,
+        avg_volume_30d=int(avg_vol_30d) if avg_vol_30d is not None else None,
+        avg_volume_90d=int(avg_vol_90d) if avg_vol_90d is not None else None,
         **fundamentals,
     )
 
@@ -227,12 +229,12 @@ class YfinanceClient:
         try:
             hist, info = await asyncio.to_thread(_fetch)
             if hist.empty:
-                logger.warning(f"yfinance returned empty data for {ticker_symbol}")
+                logger.warning("yfinance returned empty data for %s", ticker_symbol)
                 return None
 
             return _build_stock_price(code, ticker_symbol, hist, info)
         except (YFException, ValueError, KeyError, OSError) as e:
-            logger.warning(f"yfinance fetch failed for {ticker_symbol}: {e}")
+            logger.warning("yfinance fetch failed for %s: %s", ticker_symbol, e)
             return None
 
     async def get_stock_history(
@@ -289,7 +291,7 @@ class YfinanceClient:
                 rows=rows,
             )
         except (YFException, ValueError, KeyError, OSError) as e:
-            logger.warning(f"yfinance history failed for {ticker_symbol}: {e}")
+            logger.warning("yfinance history failed for %s: %s", ticker_symbol, e)
             return None
 
     async def get_fx_rates(
@@ -333,7 +335,7 @@ class YfinanceClient:
                 return None
             return FxRates(source="yfinance_fx", rates=rates)
         except (YFException, ValueError, KeyError, OSError) as e:
-            logger.warning(f"FX fetch failed: {e}")
+            logger.warning("FX fetch failed: %s", e)
             return None
 
     async def search_ticker(self, query: str) -> list[dict[str, Any]]:
@@ -368,5 +370,5 @@ class YfinanceClient:
         try:
             return await asyncio.to_thread(_fetch)
         except (YFException, ValueError, KeyError, OSError) as e:
-            logger.warning(f"yfinance search failed: {e}")
+            logger.warning("yfinance search failed: %s", e)
             return []
