@@ -1,5 +1,8 @@
 # stockprice-mcp
 
+> **Status: Maintenance mode** — This project is stable and functional but not actively developed. Issues and PRs are welcome.
+
+
 Stock price & FX rate MCP server for Claude Desktop, powered by [yfinance](https://github.com/ranaroussi/yfinance). No API key required.
 
 > **Note**: An unrelated package named `yfinance-mcp` exists on PyPI — it is not affiliated with this project.
